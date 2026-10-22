@@ -1,0 +1,6 @@
+Always read and strictly follow AGENTS.md, SPEC.md, PLAN.md, and MEMORY.md in the root directory before writing any code.
+- Only implement ONE milestone from PLAN.md at a time.
+- Never install unapproved npm packages.
+- Never expose API keys to the client bundle.
+- Keep all files under 200 lines of code.
+- Update MEMORY.md after completing any task.
