@@ -1,20 +1,27 @@
 // src/lib/stt-adapter.ts
-// Browser Speech-to-Text Adapter - Phase 1 (Web Speech API).
-// SPEC.md Section 3: Factory pattern, auto-restart on Chrome silent disconnect.
-// Phase 2 NOTE: Swap this file for Deepgram Live WebSocket adapter without
-// touching any UI or AI logic - all contracts are isolated here.
+// Speech-to-Text Adapter - supports Browser Web Speech API (Phase 1)
+// and Deepgram Nova-2 Dual-Channel WebSocket (Phase 2).
+
+import type { SpeakerRole } from '../types/index';
+import { createDeepgramDualAdapter } from './deepgram-dual-stt';
+
+export type STTMode = 'browser' | 'deepgram-dual';
 
 export interface STTCallbacks {
-  onInterim: (text: string) => void;
-  onFinal: (text: string) => void;
+  onInterim: (text: string, speaker?: SpeakerRole) => void;
+  onFinal: (text: string, speaker?: SpeakerRole) => void;
   onError: (err: string) => void;
   onStatusChange: (isListening: boolean) => void;
 }
 
 export interface STTAdapter {
-  start: () => void;
+  start: () => void | Promise<void>;
   stop: () => void;
   isSupported: () => boolean;
+}
+
+export interface STTOptions {
+  mode?: STTMode;
 }
 
 interface SpeechRecognitionEvent extends Event {
@@ -52,7 +59,11 @@ function getSpeechRecognitionConstructor():
   return Ctor ?? null;
 }
 
-export function createSTTAdapter(callbacks: STTCallbacks): STTAdapter {
+export function createSTTAdapter(callbacks: STTCallbacks, options?: STTOptions): STTAdapter {
+  if (options?.mode === 'deepgram-dual') {
+    return createDeepgramDualAdapter(callbacks);
+  }
+
   const { onInterim, onFinal, onError, onStatusChange } = callbacks;
   const Ctor = getSpeechRecognitionConstructor();
 

@@ -31,3 +31,11 @@
   - Create `src/components/SkillModal.tsx` allowing the user to edit `agencyOffer`, `callGoal`, `fillerBridges`, and `objectionMatrix` or reset to default.
   - Persist custom skills in `localStorage`.
   - Run final `npm run build` verification.
+
+- [x] **Milestone 6 (Phase 2): Dual-Channel Audio Capture (Mic + Tab Dialer) & Deepgram Live STT**
+  - Create secure Next.js route `src/app/api/deepgram-token/route.ts` returning server-side `process.env.DEEPGRAM_API_KEY`.
+  - Create `src/lib/deepgram-dual-stt.ts` capturing Caller Mic via `getUserMedia({ audio: true })` and Dialer Tab Audio via `getDisplayMedia({ video: true, audio: true })`.
+  - Use `AudioContext` and `ChannelMergerNode(2)` to merge Mic into Channel 0 (Caller) and Tab Audio into Channel 1 (Client), streaming via `MediaRecorder` to Deepgram Live Nova-2 WebSocket (`multichannel=true&model=nova-2&smart_format=true&endpointing=300`).
+  - Upgrade `src/lib/stt-adapter.ts` to support both `'browser'` and `'deepgram-dual'` modes with clean fallback.
+  - Update `src/app/page.tsx` with mode toggle, emitting `onFinal(text, speaker)` and auto-triggering `/api/suggest` only when `speaker === 'client'`.
+  - Verify with `npx tsc --noEmit`, `npm run lint`, and `npm run build`.

@@ -1,10 +1,10 @@
 # MEMORY.md — Project State & Session Handoff Log
 
 ## Current Status
-- **Phase:** Phase 1 POC (Browser STT + Streaming AI Teleprompter)
-- **Active Milestone:** ALL MILESTONES COMPLETE
-- **Last Completed Milestone:** Milestone 5 — SkillModal + localStorage ✅
-- **POC Status:** Phase 1 fully implemented and production-build verified.
+- **Phase:** Phase 2 Live (Dual-Channel Audio + Deepgram Live Nova-2 STT & Browser Fallback)
+- **Active Milestone:** Milestone 6 Complete ✅
+- **Last Completed Milestone:** Milestone 6 (Phase 2) — Dual-Channel Audio Capture + Deepgram Live STT ✅
+- **POC Status:** Phase 2 fully implemented, type-checked, lint-passed, and production-build verified.
 
 ## Completed Work Log
 - **[Init]:** Created `AGENTS.md`, `SPEC.md`, `PLAN.md`, `MEMORY.md`, `CLAUDE.md`, `.cursorrules`, and `.env.example`.
@@ -13,6 +13,12 @@
 - **[Milestone 3]:** Created `src/app/api/suggest/route.ts`. POST handler validates JSON, rejects on missing fields (422), sanitises turns (slice last 6, truncate 500 chars), builds system prompt via `buildSystemPrompt`, formats messages. If `GROQ_API_KEY` is missing/placeholder streams mock response word-by-word at ~80ms/word. Live path: fetches Groq `llama-3.3-70b-versatile` with `temperature:0.4`, `max_tokens:90`, `stream:true`; parses SSE `data:` lines; forwards only `.choices[0].delta.content` tokens as plain UTF-8. Returns `502` on Groq errors. `npx tsc --noEmit` passed with zero errors.
 - **[Milestone 4]:** Created `src/components/TranscriptPanel.tsx` (auto-scroll chat, Prospect/You bubbles, pulsing live interim box). Created `src/components/TeleprompterCard.tsx` (filler badge strip, `parseBold()` renders `**punchwords**` as yellow spans, streaming indicator, 4 quick-objection buttons). Replaced `src/app/page.tsx` with full Cold Caller Cockpit: STT adapter wired via `useEffect`/`useRef`, `appendTurn` triggers `fetchSuggestion` only on prospect turns, streaming fetch reads `ReadableStream` token-by-token into state. Top Bar: mic toggle, status badge, speaker role pills, 5 call stage pills, manual text input. All files written as UTF-8 (no BOM). Removed `runtime='edge'` — incompatible with project `cacheComponents` config. `npx tsc --noEmit` + `npm run build` both exited code 0.
 - **[Milestone 5]:** Created `src/components/SkillModal.tsx` — editable form for `name`, `agencyOffer`, `targetAudience`, `callGoal`, `fillerBridges` (one-per-line textarea), and `objectionMatrix` (dynamic trigger+strategy pairs with add/remove). Exports `loadSkillFromStorage()` and `saveSkillToStorage()` helpers used by `page.tsx`. Reset-to-default clears `localStorage` key `sales-copilot-skill` and restores `DEFAULT_AGENCY_SKILL`. Updated `page.tsx` to load skill from localStorage on mount via `useState(loadSkillFromStorage)`, added `Customize Skill` button in Top Bar, wired `handleSaveSkill` -> `saveSkillToStorage` + `setSkill`. `npx tsc --noEmit` + `npm run build` both exited code 0.
+- **[Milestone 6 (Phase 2)]:** Implemented Dual-Channel Audio Capture & Deepgram Live Nova-2 WebSocket STT.
+  - Created `src/app/api/deepgram-token/route.ts` to securely supply server-side `DEEPGRAM_API_KEY` to client without exposure in frontend bundle.
+  - Created `src/lib/deepgram-dual-stt.ts` capturing caller mic via `getUserMedia` and dialer tab audio via `getDisplayMedia`, using `AudioContext` and `ChannelMergerNode(2)` to combine into Channel 0 (Caller) and Channel 1 (Client).
+  - Streams 100ms chunks to Deepgram Nova-2 WebSocket (`multichannel=true&model=nova-2&smart_format=true&endpointing=300`). Maps channel 0 to `'caller'` and channel 1 to `'client'`, automatically triggering `/api/suggest` only on client turns.
+  - Upgraded `src/lib/stt-adapter.ts` with multi-mode interface (`'browser'` for Phase 1 free fallback and `'deepgram-dual'` for Phase 2 production live calls).
+  - Updated `src/app/page.tsx` with dynamic mode selector. All source files strictly under 200 lines. `npm run lint`, `npx tsc --noEmit`, and `npm run build` all pass with exit code 0.
 
 - **[QA Fixes]:**
   1. *Live Typing Bubble*: Added `speakerRole` support to `TranscriptPanel.tsx` and mirrored manual input typing into `interimText` in `src/app/page.tsx` so typing in the manual input renders a live typing bubble that clears upon Send.
