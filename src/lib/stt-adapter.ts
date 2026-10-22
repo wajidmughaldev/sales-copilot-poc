@@ -100,7 +100,7 @@ export function createSTTAdapter(callbacks: STTCallbacks, options?: STTOptions):
     };
 
     rec.onerror = (event: SpeechRecognitionErrorEvent) => {
-      if (event.error === 'no-speech') return;
+      if (event.error === 'no-speech' || event.error === 'aborted') return;
       onError(`STT error: ${event.error} - ${event.message ?? ''}`);
     };
 

@@ -157,14 +157,14 @@ export async function POST(req: NextRequest): Promise<Response> {
   let groqRes: Response | null = null;
   for (const model of candidateModels) {
     const res = await callGroq(model);
-    if (res.status !== 404) {
+    if (res.ok) {
       groqRes = res;
       break;
     }
   }
 
   if (!groqRes) {
-    groqRes = await callGroq('qwen/qwen3.8-27b');
+    groqRes = await callGroq('openai/gpt-oss-20b');
   }
 
   if (!groqRes.ok) {
