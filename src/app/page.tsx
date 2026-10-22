@@ -98,7 +98,11 @@ export default function CopilotPage() {
 
   const toggleMic = () => {
     if (!sttRef.current) return;
-    isListening ? sttRef.current.stop() : sttRef.current.start();
+    if (isListening) {
+      sttRef.current.stop();
+    } else {
+      sttRef.current.start();
+    }
   };
 
   const submitManual = () => {

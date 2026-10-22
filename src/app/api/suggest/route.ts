@@ -76,8 +76,16 @@ function createGroqStream(groqStream: ReadableStream<Uint8Array>): ReadableStrea
             return;
           }
           try {
-            const parsed = JSON.parse(data) as any;
-            const token = parsed.choices?.[0]?.delta?.content ?? parsed.choices?.[0]?.delta?.reasoning_content;
+            const parsed = JSON.parse(data) as {
+              choices?: Array<{
+                delta?: {
+                  content?: string;
+                  reasoning_content?: string;
+                };
+              }>;
+            };
+            const delta = parsed.choices?.[0]?.delta;
+            const token = delta?.content ?? delta?.reasoning_content;
             if (token) {
               controller.enqueue(encoder.encode(token));
             }
