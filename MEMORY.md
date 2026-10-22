@@ -19,6 +19,7 @@
   2. *Instant Stop Mic*: Updated `src/lib/stt-adapter.ts` `stop()` to immediately invoke `recognition.abort()` and synchronously fire `onStatusChange(false)` so the UI toggles to "Paused" with zero delay.
   3. *Groq API & Model Compatibility*: In `src/app/api/suggest/route.ts`, cleaned API key quotes/whitespace and added dynamic fallback across supported Groq models (`qwen/qwen3.8-27b`, `openai/gpt-oss-20b`, `llama-3.3-70b-versatile`, `llama-3.1-8b-instant`). Surface descriptive error status on failure.
   4. *Safe Skill Handling*: Added default fallback for `skill.toneRules` in `src/lib/skills.ts`.
+  5. *Linter Warnings & Punchword Highlights*: Resolved the 2 ESLint warnings causing the red "2 Issues" Next.js dev badge (`@typescript-eslint/no-unused-expressions` in `page.tsx` and `@typescript-eslint/no-explicit-any` in `route.ts`). Strengthened the system prompt rule to guarantee 2–4 bold punchwords (`**word**`) are consistently formatted and highlighted in yellow.
 
 ## Key Decisions
 - `DEFAULT_AGENCY_SKILL` targets B2B service companies (consultants, coaches, SaaS, 5–50 employees) selling done-for-you paid-ads + AI lead follow-up.
